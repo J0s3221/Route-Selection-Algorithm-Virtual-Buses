@@ -5,8 +5,9 @@ import math
 # ----------------------------
 MAX_PICKUP_DIST = 100.0
 MAX_EXTRA_DIST = 100.0
-ACCEPT_THRESHOLD = 6.0  # score from 1–10
 
+MIN_ACCEPT_THRESHOLD = 1.0  # from 1 to 10 scale
+THRESHOLD_ALPHA = 0.8  # increase per stop
 
 # ----------------------------
 # Distance function
@@ -74,6 +75,11 @@ class Bus:
             s += f"  {i+1}. {ev.kind} P{ev.pid} at {ev.loc}\n"
         return s
 
+    def acceptance_threshold(self):
+            n_stops = len(self.route)
+            threshold = MIN_ACCEPT_THRESHOLD + THRESHOLD_ALPHA * n_stops
+            return min(10.0, threshold)
+
     def evaluate_request(self, pickup, dropoff):
         # Quick rejection: pickup too far
         if distance(self.position, pickup) > MAX_PICKUP_DIST:
@@ -128,8 +134,12 @@ def main():
         score, new_route = bus.evaluate_request(pickup, dropoff)
 
         print(f"Score: {score:.2f}")
+        
+        threshold = bus.acceptance_threshold()
+        print(f"Dynamic acceptance threshold: {threshold:.2f}")
 
-        if score >= ACCEPT_THRESHOLD:
+        if score >= threshold:
+
             print("Request ACCEPTED ✅")
             bus.apply_route(new_route)
         else:
