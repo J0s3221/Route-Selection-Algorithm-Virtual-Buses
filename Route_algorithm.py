@@ -7,6 +7,14 @@ MAX_PICKUP_DIST = 20.0
 MAX_EXTRA_DIST = 25.0
 ACCEPT_THRESHOLD = 6.0  # score from 1–10
 
+
+# ----------------------------
+# Distance function
+# ----------------------------
+def distance(a, b):
+    return math.hypot(a[0] - b[0], a[1] - b[1])
+
+
 # ----------------------------
 # Event model
 # ----------------------------
@@ -57,6 +65,14 @@ class Bus:
         self.position = start
         self.route = []
         self.next_pid = 1
+
+    def __str__(self):
+        if not self.route:
+            return f"Bus at {self.position}, route empty"
+        s = f"Bus at {self.position}, route:\n"
+        for i, ev in enumerate(self.route):
+            s += f"  {i+1}. {ev.kind} P{ev.pid} at {ev.loc}\n"
+        return s
 
     def evaluate_request(self, pickup, dropoff):
         # Quick rejection: pickup too far
