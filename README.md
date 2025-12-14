@@ -2,7 +2,7 @@
 
 **This project was developed in the context of the course of Redes Veiculares of Universidade de Lisboa - Instituto Superior Tecnico**
 
-## Description
+## Introduction
 
 This program implements the selection algorithm for a virtual system of On-Demand public transit system develop as a proof of concept.
 
@@ -10,7 +10,21 @@ In this system the buses are always expecting to receive user request for pick-u
 
 To prevent the case of a user not being picked up by any bus for not fitting any current route it is also implemented a hierarchical grading that go's up with time making customers request that are waiting for longer have priority over just requests just made.
 
-This is a proof of concept project but it is thought out to be implemented in low density constricted areas which would also diminish the just state problem.
+This is a proof of concept project, but it is thought out to be implemented in low density constricted areas which would also diminish the just state problem.
+
+## Implementation & Context
+
+Start by explaining the imagened target area and the assumptions made
+
+Then explain the heuristics/rules of decision implemented
+
+## Demonstration Scenarios
+
+Here's list and explain the demonstration scenarios and their expected ouput
+
+## Pratical Guide
+
+Here explain how to run the program and tests
 
 ## Developers
 
