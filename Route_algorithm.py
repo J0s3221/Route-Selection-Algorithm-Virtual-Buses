@@ -3,8 +3,8 @@ import math
 # ----------------------------
 # Configuration parameters
 # ----------------------------
-MAX_PICKUP_DIST = 20.0
-MAX_EXTRA_DIST = 25.0
+MAX_PICKUP_DIST = 100.0
+MAX_EXTRA_DIST = 100.0
 ACCEPT_THRESHOLD = 6.0  # score from 1–10
 
 
