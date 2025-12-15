@@ -3,11 +3,14 @@ import math
 # ----------------------------
 # Configuration parameters
 # ----------------------------
-MAX_PICKUP_DIST = 100.0
-MAX_EXTRA_DIST = 100.0
+MAX_PICKUP_DIST = 200.0
+MAX_EXTRA_DIST = 200.0
 
 MIN_ACCEPT_THRESHOLD = 1.0  # from 1 to 10 scale
-THRESHOLD_ALPHA = 0.8  # increase per stop
+THRESHOLD_ALPHA = 0.2  # increase per stop
+
+MAX_PRIORITY_BONUS = 5.0
+PRIORITY_WEIGHT = 1.0
 
 # ----------------------------
 # Distance function
@@ -15,6 +18,14 @@ THRESHOLD_ALPHA = 0.8  # increase per stop
 def distance(a, b):
     return math.hypot(a[0] - b[0], a[1] - b[1])
 
+# ----------------------------
+# Event model
+# ----------------------------
+class Request:
+    def __init__(self, pickup, dropoff, priority):
+        self.pickup = pickup
+        self.dropoff = dropoff
+        self.priority = priority
 
 # ----------------------------
 # Event model
@@ -80,7 +91,10 @@ class Bus:
             threshold = MIN_ACCEPT_THRESHOLD + THRESHOLD_ALPHA * n_stops
             return min(10.0, threshold)
 
-    def evaluate_request(self, pickup, dropoff):
+    def evaluate_request(self, request):
+        pickup = request.pickup
+        dropoff = request.dropoff
+
         # Quick rejection: pickup too far
         if distance(self.position, pickup) > MAX_PICKUP_DIST:
             return 0.0, None
@@ -105,6 +119,9 @@ class Bus:
         self.route = new_route
         self.next_pid += 1
 
+def priority_bonus(request):
+    return min(MAX_PRIORITY_BONUS, PRIORITY_WEIGHT * request.priority)
+
 
 # ----------------------------
 # Main loop
@@ -113,7 +130,7 @@ def main():
     bus = Bus()
 
     print("On-Demand Bus Route Simulator")
-    print("Enter requests as: x_pickup y_pickup x_dest y_dest")
+    print("Enter requests as: x_pu y_pu x_do y_do priority")
     print("Type 'exit' to quit\n")
 
     while True:
@@ -124,22 +141,28 @@ def main():
             break
 
         try:
-            x1, y1, x2, y2 = map(float, user_input.split())
+            x1, y1, x2, y2, p = map(float, user_input.split())
             pickup = (x1, y1)
             dropoff = (x2, y2)
+            request = Request(pickup, dropoff, p)
         except ValueError:
             print("Invalid input format\n")
             continue
 
-        score, new_route = bus.evaluate_request(pickup, dropoff)
+        score, new_route = bus.evaluate_request(request)    
 
         print(f"Score: {score:.2f}")
         
         threshold = bus.acceptance_threshold()
         print(f"Dynamic acceptance threshold: {threshold:.2f}")
 
-        if score >= threshold:
+        bonus = priority_bonus(request)
+        effective_score = score + bonus
 
+        print(f"Priority bonus: {bonus:.2f}")
+        print(f"Effective score: {effective_score:.2f}")
+
+        if effective_score >= threshold:
             print("Request ACCEPTED ✅")
             bus.apply_route(new_route)
         else:
